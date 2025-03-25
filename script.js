@@ -2,6 +2,7 @@ let upPressed = false;
 let downPressed = false;
 let leftPressed = false;
 let rightPressed = false;
+let start = false;
 
 const main = document.querySelector('main');
 
@@ -50,26 +51,30 @@ for (let y of maze) {
 
 //Player movement
 function keyUp(event) {
-    if (event.key === 'ArrowUp') {
-        upPressed = false;
-    } else if (event.key === 'ArrowDown') {
-        downPressed = false;
-    } else if (event.key === 'ArrowLeft') {
-        leftPressed = false;
-    } else if (event.key === 'ArrowRight') {
-        rightPressed = false;
+    if (start === true) {
+        if (event.key === 'ArrowUp' || event.key === 'w') {
+            upPressed = false;
+        } else if (event.key === 'ArrowDown' || event.key === 's') {
+            downPressed = false;
+        } else if (event.key === 'ArrowLeft' || event.key === 'a') {
+            leftPressed = false;
+        } else if (event.key === 'ArrowRight' || event.key === 'd') {
+            rightPressed = false;
+        }
     }
 }
 
 function keyDown(event) {
-    if (event.key === 'ArrowUp') {
-        upPressed = true;
-    } else if (event.key === 'ArrowDown') {
-        downPressed = true;
-    } else if (event.key === 'ArrowLeft') {
-        leftPressed = true;
-    } else if (event.key === 'ArrowRight') {
-        rightPressed = true;
+    if (start === true) {
+        if (event.key === 'ArrowUp' || event.key === 'w') {
+            upPressed = true;
+        } else if (event.key === 'ArrowDown' || event.key === 's') {
+            downPressed = true;
+        } else if (event.key === 'ArrowLeft' || event.key === 'a') {
+            leftPressed = true;
+        } else if (event.key === 'ArrowRight' || event.key === 'd') {
+            rightPressed = true;
+        }
     }
 }
 
@@ -99,12 +104,37 @@ setInterval(function() {
         player.style.left = playerLeft + 'px';
         playerMouth.classList = 'right';
     }
-}, 10);
+}, 1)
 
 function removeStartBtn() {
     let button = document.querySelector('#startBtn');
     button.style.display = 'none';
+    start = true;
 }
+
+function mouseTrack() {
+    const pointer = document.getElementById('player');
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    // Store mouse position
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    // Constantly update rotation
+    setInterval(() => {
+        const rect = pointer.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const angle = Math.atan2(mouseY - centerY, mouseX - centerX);
+        pointer.style.transform = `rotate(${angle}rad)`;
+    }, 10);
+}
+
+mouseTrack();
 
 document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);

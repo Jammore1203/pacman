@@ -125,7 +125,10 @@ div p {
 }
 
 #player {
-    background-color: yellow;
+    background-image: url("images/arrow.png");
+    background-repeat: no-repeat;
+    background-attachment: bottom;
+    background-size: cover;
     border-radius: 100%;
     position: relative;
     width: 85%;
@@ -152,6 +155,7 @@ div p {
 }
 
 /* Styles for the player direction */
+/*
 .up, .down, .left, .right {
     width: 100%;
     height: 100%;
@@ -171,7 +175,7 @@ div p {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
 }
-
+*/
 /* Directional button styling */
 .controls {
     grid-area: controls;
