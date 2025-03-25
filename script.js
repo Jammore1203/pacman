@@ -7,7 +7,7 @@ let start = false;
 const main = document.querySelector('main');
 
 //Player = 2, Wall = 1, Enemy = 3, Point = 0
-const maze = generateMaze(11, 11);
+const maze = generateDungeon(30, 30);
 console.log(maze);
 
 //Populates the maze in the HTML
@@ -28,6 +28,9 @@ for (let row = 0; row < maze.length; row++) {
                 block.id = 'enemy';
                 block.classList.add('enemy');
                 break;
+            case 4:
+                block.id = 'debug';
+                block.classList.add('debug');
             default:
                 block.classList.add('point');
                 block.style.height = '1vh';
@@ -78,7 +81,7 @@ let playerLeft = 0;
 
 setInterval(function () {
     const playerRect = player.getBoundingClientRect();
-    const radius = 12; //size of collision box
+    const radius = 6; //size of collision box
     const speed = 1; //speed of player
 
     let dx = 0;
