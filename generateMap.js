@@ -56,10 +56,10 @@ function generateMaze(width, height) {
     return maze;
 }
 
-const MIN_ROOM_SIZE = 3;
-const MAX_DEPTH = 10;
 
-function generateDungeon(width, height) {
+//Player = 2, Wall = 1, Enemy = 3, Point = 0
+//generates a roomed map
+function generateDungeon(width, height, MIN_ROOM_SIZE, MAX_DEPTH) {
     const map = Array.from({ length: height }, () => Array(width).fill(1));
 
     const rooms = [];
@@ -145,4 +145,33 @@ function generateDungeon(width, height) {
     if (exit) map[exit.y][exit.x] = 4;
 
     return map;
+}
+
+function placeEnemies(map, count, playerPos) {
+    const walkableTiles = [];
+
+    for (let y = 1; y < map.length - 1; y++) {
+        for (let x = 1; x < map[0].length - 1; x++) {
+            if (
+                map[y][x] === 0 && // walkable
+                !(x === playerPos.x && y === playerPos.y) // not player
+            ) {
+                walkableTiles.push({ x, y });
+            }
+        }
+    }
+
+    if (walkableTiles.length === 0) {
+        console.error("No valid tiles to place enemies.");
+        return;
+    }
+
+    for (let i = 0; i < count && walkableTiles.length > 0; i++) {
+        const index = Math.floor(Math.random() * walkableTiles.length);
+        const { x, y } = walkableTiles.splice(index, 1)[0];
+        map[y][x] = 3; // enemy
+        console.log(map[x][y]);
+    }
+
+    console.log("Enemies placed:", count);
 }

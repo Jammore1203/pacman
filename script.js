@@ -6,14 +6,25 @@ let start = false;
 
 const main = document.querySelector('main');
 
-//Player = 2, Wall = 1, Enemy = 3, Point = 0
-const maze = generateDungeon(30, 30);
-console.log(maze);
+const MIN_ROOM_SIZE = 3;
+const MAX_DEPTH = 10;
+const MAP_WIDTH = 30
+const MAP_HEIGHT = 30
 
-//Populates the maze in the HTML
-for (let row = 0; row < maze.length; row++) {
-    for (let col = 0; col < maze[row].length; col++) {
-        const cellValue = maze[row][col];
+const map = generateDungeon(MAP_WIDTH, MAP_HEIGHT, MIN_ROOM_SIZE, MAX_DEPTH);
+
+
+
+console.log(map);
+
+const playerPos = findPlayerStart(map);
+
+placeEnemies(map, 5, playerPos);
+
+//Populates the map in the HTML
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        const cellValue = map[row][col];
         const block = document.createElement('div');
         block.classList.add('block');
 
@@ -31,6 +42,7 @@ for (let row = 0; row < maze.length; row++) {
             case 4:
                 block.id = 'debug';
                 block.classList.add('debug');
+                break;
             default:
                 block.classList.add('point');
                 block.style.height = '1vh';
@@ -44,6 +56,9 @@ for (let row = 0; row < maze.length; row++) {
         main.appendChild(block);
     }
 }
+
+
+
 
 
 //Player movement

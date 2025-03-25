@@ -44,3 +44,14 @@ function trackPlayer() {
         });
     }, 10);
 }
+
+function findPlayerStart(map) {
+    for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[0].length; x++) {
+            if (map[y][x] === 4) {
+                return { x, y };
+            }
+        }
+    }
+    return null;
+}
