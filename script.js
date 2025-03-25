@@ -7,26 +7,17 @@ let start = false;
 const main = document.querySelector('main');
 
 //Player = 2, Wall = 1, Enemy = 3, Point = 0
-let maze = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 2, 0, 1, 0, 0, 0, 0, 3, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 0, 0, 1, 0, 3, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-    [1, 3, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-];
+const maze = generateMaze(11, 11);
+console.log(maze);
 
 //Populates the maze in the HTML
-for (let y of maze) {
-    for (let x of y) {
-        let block = document.createElement('div');
+for (let row = 0; row < maze.length; row++) {
+    for (let col = 0; col < maze[row].length; col++) {
+        const cellValue = maze[row][col];
+        const block = document.createElement('div');
         block.classList.add('block');
 
-        switch (x) {
+        switch (cellValue) {
             case 1:
                 block.classList.add('wall', 'solid');
                 break;
@@ -43,9 +34,14 @@ for (let y of maze) {
                 block.style.width = '1vh';
         }
 
+        // Optional: Use CSS grid positioning
+        block.style.gridRowStart = row + 1;
+        block.style.gridColumnStart = col + 1;
+
         main.appendChild(block);
     }
 }
+
 
 //Player movement
 function keyUp(event) {

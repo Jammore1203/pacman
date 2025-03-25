@@ -5,7 +5,7 @@
     position: absolute;
 }
 body{
-    background-image: url("images/image.png");
+    background-image: url("../images/image.png");
     background-repeat: no-repeat;
     background-attachment: bottom;
     background-size: cover;
