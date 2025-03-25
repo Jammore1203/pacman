@@ -1,0 +1,13 @@
+.circle{
+    width: 100px;
+    height: 100px;
+    border-radius: 50% ;
+    position: absolute;
+}
+body{
+    background-image: url("images/image.png");
+    background-repeat: no-repeat;
+    background-attachment: bottom;
+    background-size: cover;
+    background-color: green;
+}
