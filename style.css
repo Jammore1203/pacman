@@ -131,9 +131,18 @@ div p {
     background-size: cover;
     border-radius: 100%;
     position: relative;
-    width: 85%;
-    height: 85%;
+    width: 60%;
+    height: 60%;
 }
+
+#debugCircle {
+    position: absolute;
+    border: 2px dashed red;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1000;
+  }
+  
 
 .enemy {
     background-image: url("images/badarrow.png");
