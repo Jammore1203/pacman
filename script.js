@@ -33,8 +33,6 @@ for (let y of maze) {
             case 2:
                 block.id = 'player';
                 let mouth = document.createElement('div');
-                mouth.classList.add('mouth');
-                block.appendChild(mouth);
                 break;
             case 3:
                 block.id = 'enemy';
