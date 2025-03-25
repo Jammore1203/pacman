@@ -136,7 +136,10 @@ div p {
 }
 
 .enemy {
-    background-color: green;
+    background-image: url("images/badarrow.png");
+    background-repeat: no-repeat;
+    background-attachment: bottom;
+    background-size: cover;
     border-radius: 100%;
     height: 90%;
     width: 90%;

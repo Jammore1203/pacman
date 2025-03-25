@@ -37,6 +37,7 @@ for (let y of maze) {
                 block.appendChild(mouth);
                 break;
             case 3:
+                block.id = 'enemy';
                 block.classList.add('enemy');
                 break;
             default:
@@ -133,6 +134,34 @@ function mouseTrack() {
         pointer.style.transform = `rotate(${angle}rad)`;
     }, 10);
 }
+
+function trackPlayer() {
+    const player = document.getElementById('player');
+    const enemies = document.querySelectorAll('.enemy');
+
+    if (!player || enemies.length === 0) {
+        console.error('Player or enemies not found');
+        return;
+    }
+
+    setInterval(() => {
+        const playerRect = player.getBoundingClientRect();
+        const playerX = playerRect.left + playerRect.width / 2;
+        const playerY = playerRect.top + playerRect.height / 2;
+
+        enemies.forEach((enemy) => {
+            const enemyRect = enemy.getBoundingClientRect();
+            const enemyX = enemyRect.left + enemyRect.width / 2;
+            const enemyY = enemyRect.top + enemyRect.height / 2;
+
+            const angle = Math.atan2(playerY - enemyY, playerX - enemyX);
+            enemy.style.transform = `rotate(${angle}rad)`;
+        });
+    }, 10);
+}
+
+trackPlayer();
+
 
 mouseTrack();
 
