@@ -175,3 +175,32 @@ function placeEnemies(map, count, playerPos) {
 
     console.log("Enemies placed:", count);
 }
+
+function placeobjectives(map, count, playerPos) {
+    const walkableTiles = [];
+
+    for (let y = 1; y < map.length - 1; y++) {
+        for (let x = 1; x < map[0].length - 1; x++) {
+            if (
+                map[y][x] === 0 && // walkable
+                !(x === playerPos.x && y === playerPos.y) // not player
+            ) {
+                walkableTiles.push({ x, y });
+            }
+        }
+    }
+
+    if (walkableTiles.length === 0) {
+        console.error("No valid tiles to place enemies.");
+        return;
+    }
+
+    for (let i = 0; i < count && walkableTiles.length > 0; i++) {
+        const index = Math.floor(Math.random() * walkableTiles.length);
+        const { x, y } = walkableTiles.splice(index, 1)[0];
+        map[y][x] = 5; // enemy
+        console.log(map[x][y]);
+    }
+
+    console.log("Enemies placed:", count);
+}

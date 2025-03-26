@@ -1,3 +1,4 @@
+// === GLOBAL STATE ===
 let upPressed = false;
 let downPressed = false;
 let leftPressed = false;
@@ -5,165 +6,123 @@ let rightPressed = false;
 let start = false;
 
 const main = document.querySelector('main');
-
 const MIN_ROOM_SIZE = 3;
 const MAX_DEPTH = 10;
-const MAP_WIDTH = 30
-const MAP_HEIGHT = 30
+const MAP_WIDTH = 30;
+const MAP_HEIGHT = 30;
 
-const map = generateDungeon(MAP_WIDTH, MAP_HEIGHT, MIN_ROOM_SIZE, MAX_DEPTH);
+let objectives = 1;
+let enemies = 1;
 
+let map = generateDungeon(MAP_WIDTH, MAP_HEIGHT, MIN_ROOM_SIZE, MAX_DEPTH);
+let playerPos = findPlayerStart(map);
+let player = null;
 
+placeEnemies(map, enemies, playerPos);
+placeobjectives(map, objectives, playerPos)
+renderMap();
 
-console.log(map);
+// === RENDER MAP ===
+function renderMap() {
+    main.innerHTML = '';
+    for (let row = 0; row < map.length; row++) {
+        for (let col = 0; col < map[row].length; col++) {
+            const cellValue = map[row][col];
+            const block = document.createElement('div');
+            block.classList.add('block');
 
-const playerPos = findPlayerStart(map);
+            switch (cellValue) {
+                case 1:
+                    block.classList.add('wall', 'solid');
+                    break;
+                case 2:
+                    block.id = 'player';
+                    break;
+                case 3:
+                    block.id = 'enemy';
+                    block.classList.add('enemy');
+                    break;
+                case 4:
+                    block.id = 'exit';
+                    block.classList.add('exit', 'debug');
+                    break;
+                case 5:
+                    block.id = 'objective'
+                    block.classList.add('objective')
+                    break;
+                default:
+                    block.classList.add('point');
+            }
 
-placeEnemies(map, 5, playerPos);
-
-//Populates the map in the HTML
-for (let row = 0; row < map.length; row++) {
-    for (let col = 0; col < map[row].length; col++) {
-        const cellValue = map[row][col];
-        const block = document.createElement('div');
-        block.classList.add('block');
-
-        switch (cellValue) {
-            case 1:
-                block.classList.add('wall', 'solid');
-                break;
-            case 2:
-                block.id = 'player';
-                break;
-            case 3:
-                block.id = 'enemy';
-                block.classList.add('enemy');
-                break;
-            case 4:
-                block.id = 'debug';
-                block.classList.add('debug');
-                break;
-            default:
-                block.classList.add('point');
-                block.style.height = '1vh';
-                block.style.width = '1vh';
-        }
-
-        // Optional: Use CSS grid positioning
-        block.style.gridRowStart = row + 1;
-        block.style.gridColumnStart = col + 1;
-
-        main.appendChild(block);
-    }
-}
-
-
-
-
-
-//Player movement
-function keyUp(event) {
-    if (start === true) {
-        if (event.key === 'ArrowUp' || event.key === 'w') {
-            upPressed = false;
-        } else if (event.key === 'ArrowDown' || event.key === 's') {
-            downPressed = false;
-        } else if (event.key === 'ArrowLeft' || event.key === 'a') {
-            leftPressed = false;
-        } else if (event.key === 'ArrowRight' || event.key === 'd') {
-            rightPressed = false;
+            block.style.gridRowStart = row + 1;
+            block.style.gridColumnStart = col + 1;
+            main.appendChild(block);
         }
     }
+    player = document.getElementById('player');
+    player.style.top = '0px';
+    player.style.left = '0px';
 }
+
+// === MOVEMENT CONTROLS ===
+document.addEventListener('keydown', keyDown);
+document.addEventListener('keyup', keyUp);
 
 function keyDown(event) {
-    if (start === true) {
-        if (event.key === 'ArrowUp' || event.key === 'w') {
-            upPressed = true;
-        } else if (event.key === 'ArrowDown' || event.key === 's') {
-            downPressed = true;
-        } else if (event.key === 'ArrowLeft' || event.key === 'a') {
-            leftPressed = true;
-        } else if (event.key === 'ArrowRight' || event.key === 'd') {
-            rightPressed = true;
-        }
-    }
+    if (!start) return;
+    if (event.key === 'ArrowUp' || event.key === 'w') upPressed = true;
+    else if (event.key === 'ArrowDown' || event.key === 's') downPressed = true;
+    else if (event.key === 'ArrowLeft' || event.key === 'a') leftPressed = true;
+    else if (event.key === 'ArrowRight' || event.key === 'd') rightPressed = true;
 }
 
-const player = document.querySelector('#player');
+function keyUp(event) {
+    if (!start) return;
+    if (event.key === 'ArrowUp' || event.key === 'w') upPressed = false;
+    else if (event.key === 'ArrowDown' || event.key === 's') downPressed = false;
+    else if (event.key === 'ArrowLeft' || event.key === 'a') leftPressed = false;
+    else if (event.key === 'ArrowRight' || event.key === 'd') rightPressed = false;
+}
+
+// === PLAYER MOVEMENT ENGINE ===
 let playerTop = 0;
 let playerLeft = 0;
+setInterval(() => {
+    if (!start || !player) return;
 
-setInterval(function () {
     const playerRect = player.getBoundingClientRect();
-    const radius = 6; //size of collision box
-    const speed = 1; //speed of player
-
+    const radius = 6;
+    const speed = 1;
     let dx = 0;
     let dy = 0;
 
-    // Check up
+    // Up
     if (upPressed) {
-        const circleX = playerRect.left + playerRect.width / 2;
-        const circleY = playerRect.top - 1 + playerRect.height / 2;
-
-        let blocked = false;
-        for (let solid of document.querySelectorAll('.solid')) {
-            if (isCircleRectColliding(circleX, circleY - radius, radius, solid.getBoundingClientRect())) {
-                blocked = true;
-                break;
-            }
-        }
-        if (!blocked) dy--;
+        const cx = playerRect.left + playerRect.width / 2;
+        const cy = playerRect.top - 1 + playerRect.height / 2;
+        if (!isBlocked(cx, cy - radius)) dy--;
     }
-
-    // Check down
+    // Down
     if (downPressed) {
-        const circleX = playerRect.left + playerRect.width / 2;
-        const circleY = playerRect.top + 1 + playerRect.height / 2;
-
-        let blocked = false;
-        for (let solid of document.querySelectorAll('.solid')) {
-            if (isCircleRectColliding(circleX, circleY + radius, radius, solid.getBoundingClientRect())) {
-                blocked = true;
-                break;
-            }
-        }
-        if (!blocked) dy++;
+        const cx = playerRect.left + playerRect.width / 2;
+        const cy = playerRect.top + 1 + playerRect.height / 2;
+        if (!isBlocked(cx, cy + radius)) dy++;
     }
-
-    // Check left
+    // Left
     if (leftPressed) {
-        const circleX = playerRect.left - 1 + playerRect.width / 2;
-        const circleY = playerRect.top + playerRect.height / 2;
-
-        let blocked = false;
-        for (let solid of document.querySelectorAll('.solid')) {
-            if (isCircleRectColliding(circleX - radius, circleY, radius, solid.getBoundingClientRect())) {
-                blocked = true;
-                break;
-            }
-        }
-        if (!blocked) dx--;
+        const cx = playerRect.left - 1 + playerRect.width / 2;
+        const cy = playerRect.top + playerRect.height / 2;
+        if (!isBlocked(cx - radius, cy)) dx--;
     }
-
-    // Check right
+    // Right
     if (rightPressed) {
-        const circleX = playerRect.left + 1 + playerRect.width / 2;
-        const circleY = playerRect.top + playerRect.height / 2;
-
-        let blocked = false;
-        for (let solid of document.querySelectorAll('.solid')) {
-            if (isCircleRectColliding(circleX + radius, circleY, radius, solid.getBoundingClientRect())) {
-                blocked = true;
-                break;
-            }
-        }
-        if (!blocked) dx++;
+        const cx = playerRect.left + 1 + playerRect.width / 2;
+        const cy = playerRect.top + playerRect.height / 2;
+        if (!isBlocked(cx + radius, cy)) dx++;
     }
 
     if (dx !== 0 && dy !== 0) {
-        dx *= Math.SQRT1_2; // ~0.707
+        dx *= Math.SQRT1_2;
         dy *= Math.SQRT1_2;
     }
 
@@ -173,30 +132,93 @@ setInterval(function () {
     player.style.left = playerLeft + 'px';
 }, 1);
 
-
-function isCircleRectColliding(circleX, circleY, radius, rect) {
-    const closestX = Math.max(rect.left, Math.min(circleX, rect.right));
-    const closestY = Math.max(rect.top, Math.min(circleY, rect.bottom));
-
-    const dx = circleX - closestX;
-    const dy = circleY - closestY;
-
-    return (dx * dx + dy * dy) < (radius * radius);
+function isBlocked(x, y) {
+    for (let solid of document.querySelectorAll('.solid')) {
+        if (isCircleRectColliding(x, y, 6, solid.getBoundingClientRect())) {
+            return true;
+        }
+    }
+    return false;
 }
 
+// === COLLISION CHECKER ===
+function isCircleRectColliding(cx, cy, radius, rect) {
+    const closestX = Math.max(rect.left, Math.min(cx, rect.right));
+    const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
+    const dx = cx - closestX;
+    const dy = cy - closestY;
+    return dx * dx + dy * dy < radius * radius;
+}
 
+// === CHECK FOR EXIT ===
+setInterval(() => {
+    const playerRect = player.getBoundingClientRect();
+    const radius = 6;
+    const cx = playerRect.left + playerRect.width / 2;
+    const cy = playerRect.top + playerRect.height / 2;
 
+    for (let solid of document.querySelectorAll('.exit')) {
+        if (isCircleRectColliding(cx, cy, radius, solid.getBoundingClientRect())) {
+            if (rObjectives === 0){
+                newlevel();
+                break;
+            }
+            break;
+        }
+    }
+}, 16);
+
+// === CHECK FOR OBJECTIVE ===
+setInterval(() => {
+    const playerRect = player.getBoundingClientRect();
+    const radius = 6;
+    const cx = playerRect.left + playerRect.width / 2;
+    const cy = playerRect.top + playerRect.height / 2;
+
+    for (let solid of document.querySelectorAll('.objective')) {
+        if (isCircleRectColliding(cx, cy, radius, solid.getBoundingClientRect())) {
+            document.querySelector('#score').innerHTML = parseInt(document.querySelector('#score').innerHTML) + 1;
+            solid.remove();
+            rObjectives--;
+            break;
+        }
+    }
+}, 16);
+
+// === START BUTTON ===
 function removeStartBtn() {
-    let button = document.querySelector('#startBtn');
-    button.style.display = 'none';
+    document.querySelector('#startBtn').style.display = 'none';
     start = true;
 }
 
+document.querySelector('#startBtn').addEventListener('click', removeStartBtn);
 
+// === NEW LEVEL HANDLER ===
+function newlevel() {
+    main.innerHTML = '';
+    player.style.top = '0px';
+    player.style.left = '0px';
+    playerTop = 0;
+    playerLeft = 0;
+    document.querySelector('#level').innerHTML = parseInt(document.querySelector('#level').innerHTML) + 1;
+    const level = parseInt(document.querySelector('#level').innerHTML);
+    if (level % 2 === 0) {
+        enemies++;
+        objectives++;
+    }
+    
+    rObjectives = objectives
 
-trackPlayer();
+    map = generateDungeon(MAP_WIDTH, MAP_HEIGHT, MIN_ROOM_SIZE, MAX_DEPTH);
+    playerPos = findPlayerStart(map);
+    placeEnemies(map, enemies, playerPos);
+    placeobjectives(map, objectives, playerPos)
+    renderMap();
+    trackPlayer(map, playerPos);
+    mouseTrack();
+}
+
+// === START TRACKING ===
+let rObjectives = objectives
+trackPlayer(map, playerPos);
 mouseTrack();
-
-document.addEventListener('keydown', keyDown);
-document.addEventListener('keyup', keyUp);
-startBtn.addEventListener('click', removeStartBtn);
