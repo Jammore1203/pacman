@@ -4,10 +4,13 @@ let downPressed = false;
 let leftPressed = false;
 let rightPressed = false;
 let start = false;
+let money = 0;
+let level = 0;
+let score = 0;
 
 const main = document.querySelector('main');
-const MIN_ROOM_SIZE = 1;
-const MAX_DEPTH = 10;
+const MIN_ROOM_SIZE = 2;
+const MAX_DEPTH = 100;
 const MAP_WIDTH = 20;
 const MAP_HEIGHT = 20;
 
@@ -156,7 +159,7 @@ function isCircleRectColliding(cx, cy, radius, rect) {
     const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
     const dx = cx - closestX;
     const dy = cy - closestY;
-    return dx * dx + dy * dy < radius * radius;
+    return dx * dx + dy * dy < radius * radius;w
 }
 
 // === CHECK FOR EXIT ===
@@ -186,9 +189,14 @@ setInterval(() => {
 
     for (let solid of document.querySelectorAll('.objective')) {
         if (isCircleRectColliding(cx, cy, radius, solid.getBoundingClientRect())) {
-            document.querySelector('#score').innerHTML = parseInt(document.querySelector('#score').innerHTML) + 1;
             solid.remove();
             rObjectives--;
+
+            score++;
+            document.querySelector('#score').innerHTML = score;
+            money = money +5;
+            document.querySelector('#money').innerHTML = money;
+
             break;
         }
     }
@@ -216,9 +224,10 @@ function newlevel() {
     player.style.left = '0px';
     playerTop = 0;
     playerLeft = 0;
-    document.querySelector('#level').innerHTML = parseInt(document.querySelector('#level').innerHTML) + 1;
-    const level = parseInt(document.querySelector('#level').innerHTML);
-    document.documentElement.style.setProperty('--theme-color', 'red');
+
+    level++;
+    document.querySelector('#level').innerHTML = level;
+
     if (level % 2 === 0) {
         enemies++;
         objectives++;

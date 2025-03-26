@@ -116,6 +116,16 @@ main {
     margin: 0.5em;
 }
 
+.money{
+    position: absolute;
+    top: 110px;
+    right: 0;
+    height: auto;
+    display: flex;
+    align-items: center;
+    margin: 0.5em;
+}
+
 .leaderboard {
     grid-area: lboard;
 }
