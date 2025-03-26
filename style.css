@@ -1,15 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+:root {
+    --walls: darkslategray;
+  }
 * {
     margin: 0;
     padding: 0;
     color: white;
-    font-family: 'Press Start 2P';
+    font-family: 'Jersey 20';
+    font-weight: 400;
+    font-size: 110%;
 }
 
 body {
     background-color: black;
-    height: 100vh;
     display: grid;
     grid-template-columns: 1fr 80vh 1fr;
     grid-template-rows: auto;
@@ -75,6 +78,8 @@ main {
     display: flex;
     align-items: center;
     margin: 0.5em;
+
+    
 }
 
 .lives li {
@@ -84,6 +89,7 @@ main {
     height: 2em;
     border-radius: 100%;
     margin: 5px;
+    font-size: 60%;
 }
 
 .lives ul {
@@ -141,14 +147,16 @@ div p {
 }
 
 #player {
-    background-image: url("images/arrow.png");
+    background-image: url("images/man.png");
     background-repeat: no-repeat;
     background-attachment: bottom;
     background-size: cover;
     border-radius: 100%;
     position: relative;
-    width: 60%;
-    height: 60%;
+    width: 100%;
+    height: 100%;
+    opacity: 100%;
+    z-index: 1000;
 }
 
 #debugCircle {
@@ -177,10 +185,20 @@ div p {
     height: 100%;
 }
 
-.point{}
+.point{
+    background-repeat: no-repeat;
+    background-attachment: bottom;
+    background-size: cover;
+    opacity: 20%;
+    width: 100%;
+    height: 100%;
+}
 
 .wall {
-    background-color: darkslategray;
+    background-repeat: no-repeat;
+    background-attachment: bottom;
+    background-size: cover;
+    background-color: var(--walls);
     width: 100%;
     height: 100%;
 }

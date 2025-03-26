@@ -6,10 +6,14 @@ let rightPressed = false;
 let start = false;
 
 const main = document.querySelector('main');
-const MIN_ROOM_SIZE = 3;
+const MIN_ROOM_SIZE = 1;
 const MAX_DEPTH = 10;
-const MAP_WIDTH = 30;
-const MAP_HEIGHT = 30;
+const MAP_WIDTH = 20;
+const MAP_HEIGHT = 20;
+
+const wallTextures = ['brick0.png', 'brick1.png', 'brick2.png'];
+const floorTextures = ['cobble0.png', 'cobble1.png'];
+
 
 let objectives = 1;
 let enemies = 1;
@@ -34,6 +38,8 @@ function renderMap() {
             switch (cellValue) {
                 case 1:
                     block.classList.add('wall', 'solid');
+                    const wallImg = wallTextures[Math.floor(Math.random() * wallTextures.length)];
+                    block.style.backgroundImage = `url('images/${wallImg}')`;
                     break;
                 case 2:
                     block.id = 'player';
@@ -52,6 +58,9 @@ function renderMap() {
                     break;
                 default:
                     block.classList.add('point');
+                    const floorImg = floorTextures[Math.floor(Math.random() * floorTextures.length)];
+                    block.style.backgroundImage = `url('images/${floorImg}')`;
+
             }
 
             block.style.gridRowStart = row + 1;
@@ -185,6 +194,13 @@ setInterval(() => {
     }
 }, 16);
 
+function randomRGB() {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
 // === START BUTTON ===
 function removeStartBtn() {
     document.querySelector('#startBtn').style.display = 'none';
@@ -202,11 +218,14 @@ function newlevel() {
     playerLeft = 0;
     document.querySelector('#level').innerHTML = parseInt(document.querySelector('#level').innerHTML) + 1;
     const level = parseInt(document.querySelector('#level').innerHTML);
+    document.documentElement.style.setProperty('--theme-color', 'red');
     if (level % 2 === 0) {
         enemies++;
         objectives++;
     }
-    
+
+    document.documentElement.style.setProperty('--walls', randomRGB());
+
     rObjectives = objectives
 
     map = generateDungeon(MAP_WIDTH, MAP_HEIGHT, MIN_ROOM_SIZE, MAX_DEPTH);
