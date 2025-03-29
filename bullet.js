@@ -1,3 +1,4 @@
+// === Ammo Logic ===
 function ammoCount() {
     if (isReloading) return;
 
@@ -19,6 +20,8 @@ function ammoCount() {
 }
 
 
+
+// === Bullet Fireing Logic ===
 function spawnBullet({ originX, originY, targetX, targetY, color, speed, radius, onHit }) {
     const angle = Math.atan2(targetY - originY, targetX - originX);
 
@@ -103,6 +106,9 @@ function fireEnemyBullet(enemy) {
     });
 }
 
+
+
+/// === Enemy / Player Hits ===
 function handleEnemyHit(enemy){
     score++;
     document.querySelector('#score').innerHTML = score;
@@ -112,11 +118,16 @@ function handleEnemyHit(enemy){
 
 function handlePlayerHit() {
     if (isPlayerInvincible) return;
+    document.documentElement.style.setProperty('--background', 'darkred');
 
     const player = document.getElementById('player');
 
     isPlayerInvincible = true;
     player.classList.add('invincible');
+
+    setTimeout(() => {
+        document.documentElement.style.setProperty('--background', 'black');
+    }, 10);
 
     setTimeout(() => {
         isPlayerInvincible = false;
@@ -137,7 +148,7 @@ function handlePlayerHit() {
 
 
 
-
+// === Collisions ===
 function playerBulletCollide(x, y, bulletElement) {
     for (let enemy of document.querySelectorAll('.enemy')) {
         const rect = enemy.getBoundingClientRect();
@@ -178,6 +189,7 @@ function enemyBulletCollide(x, y, bulletElement) {
 
 
 
+// === Initial Mouse Tracking ===
 window.mouseX = window.innerWidth / 2;
 window.mouseY = window.innerHeight / 2;
 

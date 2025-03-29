@@ -1,6 +1,7 @@
 
 :root {
     --walls: darkslategray;
+    --background: black;
   }
 * {
     margin: 0;
@@ -12,7 +13,7 @@
 }
 
 body {
-    background-color: black;
+    background-color: var(--background);
     display: grid;
     grid-template-columns: 1fr 80vh 1fr;
     grid-template-rows: auto;

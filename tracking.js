@@ -1,15 +1,14 @@
+// Tracks the users mouse and rotates player
 function mouseTrack() {
     const pointer = document.getElementById('player');
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
 
-    // Store mouse position
     document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
     });
 
-    // Constantly update rotation
     setInterval(() => {
         const rect = pointer.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -20,6 +19,9 @@ function mouseTrack() {
     }, 10);
 }
 
+
+
+// Tracks the players pos and rotates enemies
 function trackPlayer() {
     const player = document.getElementById('player');
     const enemies = document.querySelectorAll('.enemy');
@@ -45,6 +47,9 @@ function trackPlayer() {
     }, 10);
 }
 
+
+
+// Finds the players start as coords
 function findPlayerStart(map) {
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[0].length; x++) {

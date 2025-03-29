@@ -1,4 +1,4 @@
-// === GLOBAL STATE ===
+// === Alot of diffrent variables :) ===
 let upPressed = false;
 let downPressed = false;
 let leftPressed = false;
@@ -13,9 +13,11 @@ let clipSize = 5;
 let isReloading = false;
 let isPlayerInvincible = false;
 let dead = false;
+let playerTop = 0;
+let playerLeft = 0;
 
 const main = document.querySelector('main');
-const MIN_ROOM_SIZE = 2;
+const MIN_ROOM_SIZE = 3;
 const MAX_DEPTH = 100;
 const MAP_WIDTH = 20;
 const MAP_HEIGHT = 20;
@@ -31,11 +33,11 @@ let map = generateDungeon(MAP_WIDTH, MAP_HEIGHT, MIN_ROOM_SIZE, MAX_DEPTH);
 let playerPos = findPlayerStart(map);
 let player = null;
 
-placeEnemies(map, enemies, playerPos);
-placeobjectives(map, objectives, playerPos)
-renderMap();
 
-// === RENDER MAP ===
+
+
+
+// === Populate the Map ===
 function renderMap() {
     main.innerHTML = '';
     for (let row = 0; row < map.length; row++) {
@@ -82,9 +84,9 @@ function renderMap() {
     player.style.left = '0px';
 }
 
-// === MOVEMENT CONTROLS ===
-document.addEventListener('keydown', keyDown);
-document.addEventListener('keyup', keyUp);
+
+
+// === Player Movement Shit ===
 
 function keyDown(event) {
     if (!start) return;
@@ -102,9 +104,6 @@ function keyUp(event) {
     else if (event.key === 'ArrowRight' || event.key === 'd') rightPressed = false;
 }
 
-// === PLAYER MOVEMENT ENGINE ===
-let playerTop = 0;
-let playerLeft = 0;
 setInterval(() => {
     if (!start || !player || dead) return;
 
@@ -150,6 +149,9 @@ setInterval(() => {
     player.style.left = playerLeft + 'px';
 }, 1);
 
+
+
+// === Collisions ===
 function isBlocked(x, y) {
     for (let solid of document.querySelectorAll('.solid')) {
         if (isCircleRectColliding(x, y, 6, solid.getBoundingClientRect())) {
@@ -159,7 +161,6 @@ function isBlocked(x, y) {
     return false;
 }
 
-// === COLLISION CHECKER ===
 function isCircleRectColliding(cx, cy, radius, rect) {
     const closestX = Math.max(rect.left, Math.min(cx, rect.right));
     const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
@@ -168,7 +169,9 @@ function isCircleRectColliding(cx, cy, radius, rect) {
     return dx * dx + dy * dy < radius * radius;
 }
 
-// === CHECK FOR EXIT ===
+
+
+// === Exit / Money Checks ===
 setInterval(() => {
     const playerRect = player.getBoundingClientRect();
     const radius = 6;
@@ -186,7 +189,6 @@ setInterval(() => {
     }
 }, 16);
 
-// === CHECK FOR OBJECTIVE ===
 setInterval(() => {
     const playerRect = player.getBoundingClientRect();
     const radius = 6;
@@ -220,7 +222,9 @@ function randomRGB() {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-// === NEW LEVEL HANDLER ===
+
+
+// === New Level Stuff ===
 function newlevel() {
     main.innerHTML = '';
     player.style.top = '0px';
@@ -249,14 +253,22 @@ function newlevel() {
     mouseTrack();
 }
 
-// === START BUTTON ===
+
+
+// === Start / End ===
 function removeStartBtn() {
     document.querySelector('#startBtn').style.display = 'none';
     start = true;
+    isPlayerInvincible = true;
+    player.classList.add('invincible');
+
+    setTimeout(() => {
+        isPlayerInvincible = false;
+        player.classList.remove('invincible');
+    }, 1000);
 }
 
 function gameOver() {
-    // Show "Game Over" on screen
     const overlay = document.createElement('div');
     overlay.textContent = "Game Over";
     overlay.style.position = 'fixed';
@@ -272,19 +284,33 @@ function gameOver() {
     overlay.style.alignItems = 'center'
     document.body.appendChild(overlay);
 
-    // Wait 1 second then reload
     setTimeout(() => {
         window.location.reload();
     }, 1000);
 }
 
 
+// === Call Map Func ===
+placeEnemies(map, enemies, playerPos);
+placeobjectives(map, objectives, playerPos)
+renderMap();
+
+
+
+// === Do the Movement stuff
+document.addEventListener('keydown', keyDown);
+document.addEventListener('keyup', keyUp);
+
+
 document.querySelector('#startBtn').addEventListener('click', removeStartBtn);
 
-// === START TRACKING ===
+
+// === Start Tracking ===
 let rObjectives = enemies
 trackPlayer(map, playerPos);
 mouseTrack();
+
+
 
 // === Bullets ===
 ammo = clipSize;
