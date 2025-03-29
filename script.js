@@ -7,6 +7,9 @@ let start = false;
 let money = 0;
 let level = 0;
 let score = 0;
+let ammo = 0;
+let clipSize = 5;
+let isReloading = false;
 
 const main = document.querySelector('main');
 const MIN_ROOM_SIZE = 2;
@@ -49,7 +52,7 @@ function renderMap() {
                     break;
                 case 3:
                     block.id = 'enemy';
-                    block.classList.add('enemy');
+                    block.classList.add('enemy', 'solid');
                     break;
                 case 4:
                     block.id = 'exit';
@@ -159,7 +162,7 @@ function isCircleRectColliding(cx, cy, radius, rect) {
     const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
     const dx = cx - closestX;
     const dy = cy - closestY;
-    return dx * dx + dy * dy < radius * radius;w
+    return dx * dx + dy * dy < radius * radius;
 }
 
 // === CHECK FOR EXIT ===
@@ -250,3 +253,7 @@ function newlevel() {
 let rObjectives = objectives
 trackPlayer(map, playerPos);
 mouseTrack();
+
+ammo = clipSize;
+document.querySelector('#ammo').innerHTML = ammo;
+main.addEventListener('click', ammoCount);
