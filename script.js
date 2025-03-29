@@ -8,8 +8,11 @@ let money = 0;
 let level = 0;
 let score = 0;
 let ammo = 0;
+let lives = 3;
 let clipSize = 5;
 let isReloading = false;
+let isPlayerInvincible = false;
+let dead = false;
 
 const main = document.querySelector('main');
 const MIN_ROOM_SIZE = 2;
@@ -103,7 +106,7 @@ function keyUp(event) {
 let playerTop = 0;
 let playerLeft = 0;
 setInterval(() => {
-    if (!start || !player) return;
+    if (!start || !player || dead) return;
 
     const playerRect = player.getBoundingClientRect();
     const radius = 6;
@@ -203,6 +206,13 @@ setInterval(() => {
     }
 }, 16);
 
+function removeLife() {
+    const livesList = document.querySelector('.lives ul');
+    if (livesList.children.length > 0) {
+        livesList.removeChild(livesList.lastElementChild);
+    }
+}
+
 function randomRGB() {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
@@ -244,6 +254,30 @@ function removeStartBtn() {
     document.querySelector('#startBtn').style.display = 'none';
     start = true;
 }
+
+function gameOver() {
+    // Show "Game Over" on screen
+    const overlay = document.createElement('div');
+    overlay.textContent = "Game Over";
+    overlay.style.position = 'fixed';
+    overlay.style.top = '50%';
+    overlay.style.left = '50%';
+    overlay.style.transform = 'translate(-50%, -50%)';
+    overlay.style.fontSize = '48px';
+    overlay.style.color = 'white';
+    overlay.style.background = 'rgba(0, 0, 0, 0.8)';
+    overlay.style.padding = '20px 40px';
+    overlay.style.zIndex = '9999';
+    overlay.style.display = 'flex'
+    overlay.style.alignItems = 'center'
+    document.body.appendChild(overlay);
+
+    // Wait 1 second then reload
+    setTimeout(() => {
+        window.location.reload();
+    }, 1000);
+}
+
 
 document.querySelector('#startBtn').addEventListener('click', removeStartBtn);
 

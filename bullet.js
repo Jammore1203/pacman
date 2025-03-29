@@ -107,24 +107,38 @@ function handleEnemyHit(enemy){
     score++;
     document.querySelector('#score').innerHTML = score;
     rObjectives--;
-
-
     enemy.remove();
 }
 
-function handlePlayerHit(enemy){
-    if (lives > 2){
+function handlePlayerHit() {
+    if (isPlayerInvincible) return;
 
-    }else{
+    const player = document.getElementById('player');
+
+    isPlayerInvincible = true;
+    player.classList.add('invincible');
+
+    setTimeout(() => {
+        isPlayerInvincible = false;
+        player.classList.remove('invincible');
+    }, 1000);
+
+    if (lives > 0) {
         lives--;
-        document.querySelector('#lives').innerHTML = lives;
+        removeLife();
     }
 
-
+    if (lives === 0) {
+        console.log("Game Over");
+        dead = true;
+        gameOver();
+    }
 }
 
+
+
+
 function playerBulletCollide(x, y, bulletElement) {
-    // First, check if it hit an enemy
     for (let enemy of document.querySelectorAll('.enemy')) {
         const rect = enemy.getBoundingClientRect();
         if (isCircleRectColliding(x, y, 6, rect)) {
@@ -133,7 +147,6 @@ function playerBulletCollide(x, y, bulletElement) {
         }
     }
 
-    // Then check solid (walls etc)
     for (let solid of document.querySelectorAll('.solidForBullet')) {
         const rect = solid.getBoundingClientRect();
         if (isCircleRectColliding(x, y, 6, rect)) {
@@ -149,7 +162,7 @@ function enemyBulletCollide(x, y, bulletElement) {
     const rect = player.getBoundingClientRect();
 
     if (isCircleRectColliding(x, y, 6, rect)) {
-        //handlePlayerHit(); // define this function if needed
+        handlePlayerHit();
         return true;
     }
 

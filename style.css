@@ -178,6 +178,12 @@ div p {
     opacity: 100%;
     z-index: 1000;
 }
+#player.invincible {
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+    outline: 2px solid lightblue;
+}
+
 
 #debugCircle {
     position: absolute;
