@@ -2,7 +2,7 @@ function ammoCount() {
     if (isReloading) return;
 
     if (ammo > 0) {
-        spawnBullet();
+        firePlayerBullet();
         ammo--;
         document.querySelector('#ammo').innerHTML = ammo;
     } else {
@@ -19,32 +19,19 @@ function ammoCount() {
 }
 
 
-function spawnBullet() {
-    const player = document.getElementById('player');
-    const playerRect = player.getBoundingClientRect();
-    const centerX = playerRect.left + playerRect.width / 2;
-    const centerY = playerRect.top + playerRect.height / 2;
+function spawnBullet({ originX, originY, targetX, targetY, color, speed, radius, onHit }) {
+    const angle = Math.atan2(targetY - originY, targetX - originX);
 
-    // Get mouse position at time of firing
-    const mouseX = window.mouseX || window.innerWidth / 2;
-    const mouseY = window.mouseY || window.innerHeight / 2;
-
-    const angle = Math.atan2(mouseY - centerY, mouseX - centerX);
-
-    // Create bullet
     const bullet = document.createElement('div');
     bullet.classList.add('bullet');
     bullet.style.position = 'absolute';
-    bullet.style.width = '10px';
-    bullet.style.height = '10px';
+    bullet.style.width = radius * 2 + 'px';
+    bullet.style.height = radius * 2 + 'px';
     bullet.style.borderRadius = '50%';
-    bullet.style.backgroundColor = 'yellow';
-    bullet.style.left = centerX + 'px';
-    bullet.style.top = centerY + 'px';
+    bullet.style.backgroundColor = color;
+    bullet.style.left = originX + 'px';
+    bullet.style.top = originY + 'px';
     document.body.appendChild(bullet);
-
-    const speed = 10;
-    const radius = 2;
 
     const interval = setInterval(() => {
         let bulletX = parseFloat(bullet.style.left);
@@ -53,17 +40,15 @@ function spawnBullet() {
         const newX = bulletX + Math.cos(angle) * speed;
         const newY = bulletY + Math.sin(angle) * speed;
 
-        // Get center for collision
-        const cx = newX + radius; // 5 = radius
+        const cx = newX + radius;
         const cy = newY + radius;
 
-        if (isBlocked(cx, cy)) {
+        if (onHit && onHit(cx, cy, bullet)) {
             bullet.remove();
             clearInterval(interval);
             return;
         }
 
-        // Remove if off screen
         if (newX < 0 || newX > window.innerWidth || newY < 0 || newY > window.innerHeight) {
             bullet.remove();
             clearInterval(interval);
@@ -74,6 +59,112 @@ function spawnBullet() {
         bullet.style.top = newY + 'px';
     }, 16);
 }
+
+function firePlayerBullet() {
+    const player = document.getElementById('player');
+    const playerRect = player.getBoundingClientRect();
+
+    const originX = playerRect.left + playerRect.width / 2;
+    const originY = playerRect.top + playerRect.height / 2;
+    const mouseX = window.mouseX || window.innerWidth / 2;
+    const mouseY = window.mouseY || window.innerHeight / 2;
+
+    spawnBullet({
+        originX,
+        originY,
+        targetX: mouseX,
+        targetY: mouseY,
+        color: 'yellow',
+        speed: 10,
+        radius: 3,
+        onHit: playerBulletCollide
+    });
+}
+
+function fireEnemyBullet(enemy) {
+    const enemyRect = enemy.getBoundingClientRect();
+    const player = document.getElementById('player');
+    const playerRect = player.getBoundingClientRect();
+
+    const originX = enemyRect.left + enemyRect.width / 2;
+    const originY = enemyRect.top + enemyRect.height / 2;
+    const targetX = playerRect.left + playerRect.width / 2;
+    const targetY = playerRect.top + playerRect.height / 2;
+
+    spawnBullet({
+        originX,
+        originY,
+        targetX,
+        targetY,
+        color: 'red',
+        speed: 4,
+        radius: 5,
+        onHit: enemyBulletCollide
+    });
+}
+
+function handleEnemyHit(enemy){
+    score++;
+    document.querySelector('#score').innerHTML = score;
+    rObjectives--;
+
+
+    enemy.remove();
+}
+
+function handlePlayerHit(enemy){
+    if (lives > 2){
+
+    }else{
+        lives--;
+        document.querySelector('#lives').innerHTML = lives;
+    }
+
+
+}
+
+function playerBulletCollide(x, y, bulletElement) {
+    // First, check if it hit an enemy
+    for (let enemy of document.querySelectorAll('.enemy')) {
+        const rect = enemy.getBoundingClientRect();
+        if (isCircleRectColliding(x, y, 6, rect)) {
+            handleEnemyHit(enemy);
+            return true;
+        }
+    }
+
+    // Then check solid (walls etc)
+    for (let solid of document.querySelectorAll('.solidForBullet')) {
+        const rect = solid.getBoundingClientRect();
+        if (isCircleRectColliding(x, y, 6, rect)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function enemyBulletCollide(x, y, bulletElement) {
+    const player = document.getElementById('player');
+    const rect = player.getBoundingClientRect();
+
+    if (isCircleRectColliding(x, y, 6, rect)) {
+        //handlePlayerHit(); // define this function if needed
+        return true;
+    }
+
+    for (let solid of document.querySelectorAll('.solidForEnemyBullet')) {
+        const rect = solid.getBoundingClientRect();
+        if (isCircleRectColliding(x, y, 6, rect)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+
 window.mouseX = window.innerWidth / 2;
 window.mouseY = window.innerHeight / 2;
 

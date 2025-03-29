@@ -43,7 +43,7 @@ function renderMap() {
 
             switch (cellValue) {
                 case 1:
-                    block.classList.add('wall', 'solid');
+                    block.classList.add('wall', 'solid', 'solidForBullet', 'solidForEnemyBullet');
                     const wallImg = wallTextures[Math.floor(Math.random() * wallTextures.length)];
                     block.style.backgroundImage = `url('images/${wallImg}')`;
                     break;
@@ -52,15 +52,15 @@ function renderMap() {
                     break;
                 case 3:
                     block.id = 'enemy';
-                    block.classList.add('enemy', 'solid');
+                    block.classList.add('enemy', 'solidForBullet');
                     break;
                 case 4:
                     block.id = 'exit';
-                    block.classList.add('exit', 'debug');
+                    block.classList.add('exit', 'debug', 'solidForBullet', 'solidForEnemyBullet');
                     break;
                 case 5:
                     block.id = 'objective'
-                    block.classList.add('objective')
+                    block.classList.add('objective', 'solidForBullet', 'solidForEnemyBullet');
                     break;
                 default:
                     block.classList.add('point');
@@ -193,11 +193,9 @@ setInterval(() => {
     for (let solid of document.querySelectorAll('.objective')) {
         if (isCircleRectColliding(cx, cy, radius, solid.getBoundingClientRect())) {
             solid.remove();
-            rObjectives--;
 
-            score++;
-            document.querySelector('#score').innerHTML = score;
-            money = money +5;
+
+            money = money + 10;
             document.querySelector('#money').innerHTML = money;
 
             break;
@@ -211,14 +209,6 @@ function randomRGB() {
     const b = Math.floor(Math.random() * 256);
     return `rgb(${r}, ${g}, ${b})`;
 }
-
-// === START BUTTON ===
-function removeStartBtn() {
-    document.querySelector('#startBtn').style.display = 'none';
-    start = true;
-}
-
-document.querySelector('#startBtn').addEventListener('click', removeStartBtn);
 
 // === NEW LEVEL HANDLER ===
 function newlevel() {
@@ -249,11 +239,28 @@ function newlevel() {
     mouseTrack();
 }
 
+// === START BUTTON ===
+function removeStartBtn() {
+    document.querySelector('#startBtn').style.display = 'none';
+    start = true;
+}
+
+document.querySelector('#startBtn').addEventListener('click', removeStartBtn);
+
 // === START TRACKING ===
-let rObjectives = objectives
+let rObjectives = enemies
 trackPlayer(map, playerPos);
 mouseTrack();
 
+// === Bullets ===
 ammo = clipSize;
 document.querySelector('#ammo').innerHTML = ammo;
 main.addEventListener('click', ammoCount);
+
+setInterval(() => {
+    if (start === true){
+        document.querySelectorAll('.enemy').forEach(enemy => {
+            fireEnemyBullet(enemy);
+        });
+    }
+}, 1000);

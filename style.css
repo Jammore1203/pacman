@@ -200,9 +200,13 @@ div p {
 }
 
 .objective{
-    background-color: yellow;
-    width: 100%;
-    height: 100%;
+    background-image: url("images/coin.png");
+    background-repeat: no-repeat;
+    background-attachment: bottom;
+    background-size: cover;
+    width: 60%;
+    height: 60%;
+    z-index: 1;
 }
 
 .point{
@@ -212,6 +216,7 @@ div p {
     opacity: 20%;
     width: 100%;
     height: 100%;
+    z-index: 0;
 }
 
 .wall {
@@ -221,12 +226,14 @@ div p {
     background-color: var(--walls);
     width: 100%;
     height: 100%;
+    z-index: 1;
 }
 
 .debug{
     background-color: green;
     width: 100%;
     height: 100%;
+    z-index: 1;
 }
 
 
